@@ -1,42 +1,62 @@
-let valEl = document.getElementById("val")
-let resEl = document.getElementById("res")
-function clearer(){
-    valEl.innerText = ""
-    resEl.innerText = ""
+const valEl = document.getElementById("val");
+const resEl = document.getElementById("res");
+
+function clearer() {
+    valEl.innerText = "";
+    resEl.innerText = "";
 }
-function adder(k){
-    valEl.innerText += k
-    if(k=='*' || k=='+' || k=='-' || k=='/'){
-        compute(0)
+
+function adder(k) {
+    valEl.innerText += k;
+    if (['*', '+', '-', '/'].includes(k)) {
+        compute(0);
     }
 }
-function compute(is){
-    let temp = valEl.innerText, i
-    let t = temp[temp.length-1];
-    for(i=0;i<temp.length-1;i++){
-        if((temp[i]=='*' || temp[i]=='+' || temp[i]=='-' || temp[i]=='/') && i!=0){
-            break;
+
+function compute(is) {
+    const temp = valEl.innerText;
+    const lastChar = temp[temp.length - 1];
+
+    // Encontra o primeiro operador
+    const operatorIndex = [...temp].findIndex((char, index) => 
+        ['*', '+', '-', '/'].includes(char) && index !== 0
+    );
+
+    if (operatorIndex !== -1) {
+        const part1 = parseFloat(temp.substring(0, operatorIndex));
+        const part2 = parseFloat(temp.substring(operatorIndex + 1));
+        const operator = temp[operatorIndex];
+
+        let result;
+        switch (operator) {
+            case '+':
+                result = part1 + part2;
+                break;
+            case '-':
+                result = part1 - part2;
+                break;
+            case '*':
+                result = part1 * part2;
+                break;
+            case '/':
+                // Verifica divisão por zero
+                if (part2 === 0) {
+                    resEl.innerText = "Erro: Divisão por zero";
+                    return;
+                }
+                result = part1 / part2;
+                break;
+            default:
+                return;
         }
-    }
-    if(i!=temp.length-1){
-        let part1 = parseFloat(temp.substring(0,i));
-        let part2 = parseFloat(temp.substring(i+1));
-        let k5 = temp[i];
-        if(k5=='+'){
-            resEl.innerText = (part1)+(part2);
-        }else if(k5=='-'){
-            resEl.innerText = (part1)-(part2);
-        }else if(k5=='*'){
-            resEl.innerText = (part1)*(part2);
-        }else{
-            resEl.innerText = (part1)/(part2);
-        }
-        resEl.innerText = '= ' + resEl.innerText
-        if(!is){
-            valEl.innerText = resEl.innerText + t
-            if(valEl.innerText[0] == '='){
-                valEl.innerText = valEl.innerText.substring(1)
+
+        resEl.innerText = '= ' + result;
+
+        if (!is) {
+            valEl.innerText = resEl.innerText + lastChar;
+            if (valEl.innerText[0] === '=') {
+                valEl.innerText = valEl.innerText.substring(1);
             }
-        } 
+        }
     }
 }
